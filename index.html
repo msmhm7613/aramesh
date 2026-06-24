@@ -14,7 +14,7 @@
 
         body {
             margin: 0;
-            font-family: tahoma;
+            font-family: "B Titr";
         }
 
         #map {
@@ -75,8 +75,10 @@ background:#f8f9fa;
     let lastLng = null;
 
     const destination = {
-        lat: 31.856782644793213,
-        lng: 54.34915489309451
+        lat: 32.144369570819734,
+        lng: 54.112763037090076
+        /*lat: 31.856782644793213,
+        lng: 54.34915489309451*/
     };
 
     const map = L.map('map').setView(
@@ -90,6 +92,12 @@ background:#f8f9fa;
             maxZoom: 19
         }
     ).addTo(map);
+
+    const carIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/744/744465.png",
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
 
     let driverMarker = null;
     let routeLine = null;
@@ -383,9 +391,14 @@ background:#f8f9fa;
             if (!driverMarker) {
 
                 driverMarker =
-                    L.marker([lat, lng])
+                    L.marker(
+                        [lat,lng],
+                        {
+                            icon: carIcon
+                        }
+                    )
                         .addTo(map)
-                        .bindPopup("موقعیت شما");
+                        .bindPopup("خودرو");
 
                 map.setView([lat, lng], 15);
 
