@@ -18,7 +18,7 @@
         }
 
         #map {
-            height: 90vh;
+            height: 50vh;
         }
 
         #panel {
@@ -164,7 +164,7 @@ background:#f8f9fa;
 
         steps.forEach((step, index) => {
 
-            let icon = "➡️";
+            let icon = "⬆️";
             let text = "";
 
             if (step.maneuver.type === "turn") {
@@ -298,13 +298,14 @@ background:#f8f9fa;
     navigator.geolocation.watchPosition(
         async (position) => {
 
-            const lat = 31.868020606759416;
-            /*const lat =
-                position.coords.latitude;*/
+            // const lat = 31.868020606759416;
+            const lat =
+                position.coords.latitude;
 
-            /*const lng =
-                position.coords.longitude;*/
-            const lng = 54.35372714456066;
+
+            // const lng = 54.35372714456066;
+            const lng =
+                position.coords.longitude;
 
             const speed =
                 position.coords.speed || 0;
