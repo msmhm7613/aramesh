@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>مسیریاب لحظه‌ای</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+
+body{
+    margin:0;
+    font-family:tahoma;
+}
+
+#map{
+    height:90vh;
+}
+
+#panel{
+    height:10vh;
+    padding:10px;
+    background:#f4f4f4;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    font-size:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="panel">
+    <span id="speed">سرعت: 0 km/h</span>
+    <span id="distance">مسافت: ---</span>
+    <span id="duration">زمان: ---</span>
+</div>
+
+<div id="map"></div>
+
+<div id="navigation" style="
+padding:12px;
+background:#fff3cd;
+border-bottom:1px solid #ddd;
+font-size:18px;
+font-weight:bold;
+text-align:center;
+">
+    در حال محاسبه مسیر...
+</div>
+
+<div id="steps"
+     style="
+padding:10px;
+max-height:250px;
+overflow-y:auto;
+background:#f8f9fa;
+">
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const destination = {
+    lat: 31.856782644793213,
+    lng: 54.34915489309451
+};
+
+const map = L.map('map').setView(
+    [destination.lat,destination.lng],
+    13
+);
+
+L.tileLayer(
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+        maxZoom:19
+    }
+).addTo(map);
+
+let driverMarker = null;
+let routeLine = null;
+
+L.marker([
+    destination.lat,
+    destination.lng
+]).addTo(map)
+.bindPopup("مقصد");
+
+async function updateRoute(lat,lng){
+
+    const url =
+        `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destination.lng},${destination.lat}?overview=full&steps=true&geometries=geojson`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if(!data.routes || !data.routes.length){
+        return;
+    }
+
+    const route = data.routes[0];
+
+    updateNavigation(route);
+    renderSteps(route);
+    
+    const coordinates =
+    route.geometry.coordinates.map(
+        p => [p[1],p[0]]
+    );
+
+    if(routeLine){
+        map.removeLayer(routeLine);
+    }
+
+    routeLine = L.polyline(
+        coordinates,
+        {
+            weight:6
+        }
+    ).addTo(map);
+
+    document.getElementById("distance").innerHTML =
+        "مسافت: " +
+        (route.distance/1000).toFixed(2) +
+        " km";
+
+    document.getElementById("duration").innerHTML =
+        "زمان: " +
+        Math.round(route.duration/60) +
+        " min";
+
+    const remain = route.distance;
+
+    if(remain < 30){
+        alert("به مقصد رسیدید");
+    }
+}
+
+function renderSteps(route){
+
+    const steps =
+        route.legs[0].steps;
+
+    let html = "";
+
+    steps.forEach((step,index)=>{
+
+        let icon = "➡️";
+        let text = "";
+
+        if(step.maneuver.type === "turn"){
+
+            if(step.maneuver.modifier === "right"){
+                icon = "➡️";
+                text = "به راست بپیچید";
+            }
+
+            else if(step.maneuver.modifier === "left"){
+                icon = "⬅️";
+                text = "به چپ بپیچید";
+            }
+
+            else{
+                text = "تغییر مسیر";
+            }
+
+        }else if(
+            step.maneuver.type === "roundabout"
+        ){
+
+            icon = "🔄";
+            text = "ورود به میدان";
+
+        }else if(
+            step.maneuver.type === "arrive"
+        ){
+
+            icon = "🏁";
+            text = "رسیدن به مقصد";
+
+        }else{
+
+            text = "مستقیم حرکت کنید";
+
+        }
+
+        html += `
+        <div style="
+            padding:8px;
+            border-bottom:1px solid #ddd;
+        ">
+            <b>${index+1}.</b>
+            ${icon}
+            ${text}
+            <br>
+            <small>
+            ${Math.round(step.distance)}
+            متر
+            </small>
+        </div>
+        `;
+    });
+
+    document
+        .getElementById("steps")
+        .innerHTML = html;
+}
+
+function updateNavigation(route){
+
+    if(
+        !route.legs ||
+        !route.legs.length ||
+        !route.legs[0].steps.length
+    ){
+        return;
+    }
+
+    const step = route.legs[0].steps[0];
+
+    let text =
+        `${Math.round(step.distance)} متر مستقیم حرکت کنید`;
+
+    if(step.maneuver.type === "turn"){
+
+        if(step.maneuver.modifier === "right"){
+            text =
+                `➡️ ${Math.round(step.distance)} متر جلوتر به راست بپیچید`;
+        }
+
+        if(step.maneuver.modifier === "left"){
+            text =
+                `⬅️ ${Math.round(step.distance)} متر جلوتر به چپ بپیچید`;
+        }
+
+        if(step.maneuver.modifier === "slight-right"){
+            text =
+                `↗️ ${Math.round(step.distance)} متر جلوتر کمی به راست بروید`;
+        }
+
+        if(step.maneuver.modifier === "slight-left"){
+            text =
+                `↖️ ${Math.round(step.distance)} متر جلوتر کمی به چپ بروید`;
+        }
+    }
+
+    if(step.maneuver.type === "roundabout"){
+        text =
+            `🔄 در میدان از خروجی مناسب خارج شوید`;
+    }
+
+    if(step.maneuver.type === "arrive"){
+        text =
+            `🏁 به مقصد رسیدید`;
+    }
+
+    document.getElementById("navigation")
+        .innerHTML = text;
+}
+
+navigator.geolocation.watchPosition(
+
+    async(position)=>{
+
+        const lat = 31.868020606759416;
+        /*const lat =
+            position.coords.latitude;*/
+
+        /*const lng =
+            position.coords.longitude;*/
+        const lng = 54.35372714456066;
+
+        const speed =
+            position.coords.speed || 0;
+
+        document.getElementById("speed")
+            .innerHTML =
+            "سرعت: " +
+            (speed*3.6).toFixed(1) +
+            " km/h";
+
+        if(!driverMarker){
+
+            driverMarker =
+                L.marker([lat,lng])
+                .addTo(map)
+                .bindPopup("موقعیت شما");
+
+            map.setView([lat,lng],15);
+
+        }else{
+
+            driverMarker.setLatLng(
+                [lat,lng]
+            );
+        }
+
+        await updateRoute(
+            lat,
+            lng
+        );
+
+    },
+
+    (err)=>{
+        alert(
+            "اجازه دسترسی به GPS داده نشد"
+        );
+    },
+
+    {
+        enableHighAccuracy:true,
+        maximumAge:0,
+        timeout:10000
+    }
+
+);
+
+</script>
+
+</body>
+</html>
