@@ -2,36 +2,36 @@
 
 <html lang="fa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>مسیریاب لحظه‌ای</title>
+    <title>مسیریاب لحظه‌ای</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<style>
+    <style>
 
-body{
-    margin:0;
-    font-family:tahoma;
-}
+        body {
+            margin: 0;
+            font-family: tahoma;
+        }
 
-#map{
-    height:90vh;
-}
+        #map {
+            height: 90vh;
+        }
 
-#panel{
-    height:10vh;
-    padding:10px;
-    background:#f4f4f4;
-    display:flex;
-    align-items:center;
-    gap:20px;
-    font-size:15px;
-}
+        #panel {
+            height: 10vh;
+            padding: 10px;
+            background: #f4f4f4;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 15px;
+        }
 
-</style>
+    </style>
 
 </head>
 
@@ -69,136 +69,142 @@ background:#f8f9fa;
 
 <script>
 
-const destination = {
-    lat: 31.856782644793213,
-    lng: 54.34915489309451
-};
+    let lastRouteUpdate = 0;
+    let lastLat = null;
+    let lastLng = null;
 
-const map = L.map('map').setView(
-    [destination.lat,destination.lng],
-    13
-);
+    const destination = {
+        lat: 31.856782644793213,
+        lng: 54.34915489309451
+    };
 
-L.tileLayer(
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-        maxZoom:19
-    }
-).addTo(map);
-
-let driverMarker = null;
-let routeLine = null;
-
-L.marker([
-    destination.lat,
-    destination.lng
-]).addTo(map)
-.bindPopup("مقصد");
-
-async function updateRoute(lat,lng){
-
-    const url =
-        `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destination.lng},${destination.lat}?overview=full&steps=true&geometries=geojson`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if(!data.routes || !data.routes.length){
-        return;
-    }
-
-    const route = data.routes[0];
-
-    updateNavigation(route);
-    renderSteps(route);
-    
-    const coordinates =
-    route.geometry.coordinates.map(
-        p => [p[1],p[0]]
+    const map = L.map('map').setView(
+        [destination.lat, destination.lng],
+        13
     );
 
-    if(routeLine){
-        map.removeLayer(routeLine);
-    }
-
-    routeLine = L.polyline(
-        coordinates,
+    L.tileLayer(
+        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
-            weight:6
+            maxZoom: 19
         }
     ).addTo(map);
 
-    document.getElementById("distance").innerHTML =
-        "مسافت: " +
-        (route.distance/1000).toFixed(2) +
-        " km";
+    let driverMarker = null;
+    let routeLine = null;
 
-    document.getElementById("duration").innerHTML =
-        "زمان: " +
-        Math.round(route.duration/60) +
-        " min";
+    L.marker([
+        destination.lat,
+        destination.lng
+    ]).addTo(map)
+        .bindPopup("مقصد");
 
-    const remain = route.distance;
+    async function updateRoute(lat, lng) {
 
-    if(remain < 30){
-        alert("به مقصد رسیدید");
-    }
-}
+        const url =
+            `https://router.project-osrm.org/route/v1/driving/${lng},${lat};${destination.lng},${destination.lat}?overview=full&steps=true&geometries=geojson`;
 
-function renderSteps(route){
+        const response = await fetch(url);
+        const data = await response.json();
 
-    const steps =
-        route.legs[0].steps;
+        if (!data.routes || !data.routes.length) {
+            return;
+        }
 
-    let html = "";
+        const route = data.routes[0];
 
-    steps.forEach((step,index)=>{
+        updateNavigation(route);
+        renderSteps(route);
 
-        let icon = "➡️";
-        let text = "";
+        const coordinates =
+            route.geometry.coordinates.map(
+                p => [p[1], p[0]]
+            );
 
-        if(step.maneuver.type === "turn"){
+        if(!routeLine){
 
-            if(step.maneuver.modifier === "right"){
-                icon = "➡️";
-                text = "به راست بپیچید";
-            }
-
-            else if(step.maneuver.modifier === "left"){
-                icon = "⬅️";
-                text = "به چپ بپیچید";
-            }
-
-            else{
-                text = "تغییر مسیر";
-            }
-
-        }else if(
-            step.maneuver.type === "roundabout"
-        ){
-
-            icon = "🔄";
-            text = "ورود به میدان";
-
-        }else if(
-            step.maneuver.type === "arrive"
-        ){
-
-            icon = "🏁";
-            text = "رسیدن به مقصد";
+            routeLine = L.polyline(
+                coordinates,
+                {
+                    weight:6
+                }
+            ).addTo(map);
 
         }else{
 
-            text = "مستقیم حرکت کنید";
+            routeLine.setLatLngs(
+                coordinates
+            );
 
         }
 
-        html += `
+        document.getElementById("distance").innerHTML =
+            "مسافت: " +
+            (route.distance / 1000).toFixed(2) +
+            " km";
+
+        document.getElementById("duration").innerHTML =
+            "زمان: " +
+            Math.round(route.duration / 60) +
+            " min";
+
+        const remain = route.distance;
+
+        if (remain < 30) {
+            alert("به مقصد رسیدید");
+        }
+    }
+
+    function renderSteps(route) {
+
+        const steps =
+            route.legs[0].steps;
+
+        let html = "";
+
+        steps.forEach((step, index) => {
+
+            let icon = "➡️";
+            let text = "";
+
+            if (step.maneuver.type === "turn") {
+
+                if (step.maneuver.modifier === "right") {
+                    icon = "➡️";
+                    text = "به راست بپیچید";
+                } else if (step.maneuver.modifier === "left") {
+                    icon = "⬅️";
+                    text = "به چپ بپیچید";
+                } else {
+                    text = "تغییر مسیر";
+                }
+
+            } else if (
+                step.maneuver.type === "roundabout"
+            ) {
+
+                icon = "🔄";
+                text = "ورود به میدان";
+
+            } else if (
+                step.maneuver.type === "arrive"
+            ) {
+
+                icon = "🏁";
+                text = "رسیدن به مقصد";
+
+            } else {
+
+                text = "مستقیم حرکت کنید";
+
+            }
+
+            html += `
         <div style="
             padding:8px;
             border-bottom:1px solid #ddd;
         ">
-            <b>${index+1}.</b>
+            <b>${index + 1}.</b>
             ${icon}
             ${text}
             <br>
@@ -208,122 +214,162 @@ function renderSteps(route){
             </small>
         </div>
         `;
-    });
+        });
 
-    document
-        .getElementById("steps")
-        .innerHTML = html;
-}
-
-function updateNavigation(route){
-
-    if(
-        !route.legs ||
-        !route.legs.length ||
-        !route.legs[0].steps.length
-    ){
-        return;
+        document
+            .getElementById("steps")
+            .innerHTML = html;
     }
 
-    const step = route.legs[0].steps[0];
+    function updateNavigation(route) {
 
-    let text =
-        `${Math.round(step.distance)} متر مستقیم حرکت کنید`;
-
-    if(step.maneuver.type === "turn"){
-
-        if(step.maneuver.modifier === "right"){
-            text =
-                `➡️ ${Math.round(step.distance)} متر جلوتر به راست بپیچید`;
+        if (
+            !route.legs ||
+            !route.legs.length ||
+            !route.legs[0].steps.length
+        ) {
+            return;
         }
 
-        if(step.maneuver.modifier === "left"){
-            text =
-                `⬅️ ${Math.round(step.distance)} متر جلوتر به چپ بپیچید`;
+        const step = route.legs[0].steps[0];
+
+        let text =
+            `${Math.round(step.distance)} متر مستقیم حرکت کنید`;
+
+        if (step.maneuver.type === "turn") {
+
+            if (step.maneuver.modifier === "right") {
+                text =
+                    `➡️ ${Math.round(step.distance)} متر جلوتر به راست بپیچید`;
+            }
+
+            if (step.maneuver.modifier === "left") {
+                text =
+                    `⬅️ ${Math.round(step.distance)} متر جلوتر به چپ بپیچید`;
+            }
+
+            if (step.maneuver.modifier === "slight-right") {
+                text =
+                    `↗️ ${Math.round(step.distance)} متر جلوتر کمی به راست بروید`;
+            }
+
+            if (step.maneuver.modifier === "slight-left") {
+                text =
+                    `↖️ ${Math.round(step.distance)} متر جلوتر کمی به چپ بروید`;
+            }
         }
 
-        if(step.maneuver.modifier === "slight-right"){
+        if (step.maneuver.type === "roundabout") {
             text =
-                `↗️ ${Math.round(step.distance)} متر جلوتر کمی به راست بروید`;
+                `🔄 در میدان از خروجی مناسب خارج شوید`;
         }
 
-        if(step.maneuver.modifier === "slight-left"){
+        if (step.maneuver.type === "arrive") {
             text =
-                `↖️ ${Math.round(step.distance)} متر جلوتر کمی به چپ بروید`;
+                `🏁 به مقصد رسیدید`;
         }
+
+        document.getElementById("navigation")
+            .innerHTML = text;
     }
 
-    if(step.maneuver.type === "roundabout"){
-        text =
-            `🔄 در میدان از خروجی مناسب خارج شوید`;
+    function getDistance(lat1, lon1, lat2, lon2) {
+
+        const R = 6371000;
+
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) *
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+
+        return R * (
+            2 * Math.atan2(
+                Math.sqrt(a),
+                Math.sqrt(1 - a)
+            )
+        );
     }
 
-    if(step.maneuver.type === "arrive"){
-        text =
-            `🏁 به مقصد رسیدید`;
-    }
+    navigator.geolocation.watchPosition(
+        async (position) => {
 
-    document.getElementById("navigation")
-        .innerHTML = text;
-}
+            const lat = 31.868020606759416;
+            /*const lat =
+                position.coords.latitude;*/
 
-navigator.geolocation.watchPosition(
+            /*const lng =
+                position.coords.longitude;*/
+            const lng = 54.35372714456066;
 
-    async(position)=>{
+            const speed =
+                position.coords.speed || 0;
 
-        const lat = 31.868020606759416;
-        /*const lat =
-            position.coords.latitude;*/
+            document.getElementById("speed")
+                .innerHTML =
+                "سرعت: " +
+                (speed * 3.6).toFixed(1) +
+                " km/h";
 
-        /*const lng =
-            position.coords.longitude;*/
-        const lng = 54.35372714456066;
+            if (!driverMarker) {
 
-        const speed =
-            position.coords.speed || 0;
+                driverMarker =
+                    L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup("موقعیت شما");
 
-        document.getElementById("speed")
-            .innerHTML =
-            "سرعت: " +
-            (speed*3.6).toFixed(1) +
-            " km/h";
+                map.setView([lat, lng], 15);
 
-        if(!driverMarker){
+            } else {
 
-            driverMarker =
-                L.marker([lat,lng])
-                .addTo(map)
-                .bindPopup("موقعیت شما");
+                driverMarker.setLatLng(
+                    [lat, lng]
+                );
+            }
 
-            map.setView([lat,lng],15);
+            const movedEnough =
+                lastLat === null ||
+                getDistance(
+                    lastLat,
+                    lastLng,
+                    lat,
+                    lng
+                ) > 20;
 
-        }else{
+            const enoughTimePassed =
+                Date.now() - lastRouteUpdate > 5000;
 
-            driverMarker.setLatLng(
-                [lat,lng]
+            if(movedEnough && enoughTimePassed){
+
+                lastLat = lat;
+                lastLng = lng;
+
+                lastRouteUpdate = Date.now();
+
+                await updateRoute(
+                    lat,
+                    lng
+                );
+            }
+
+        },
+
+        (err) => {
+            alert(
+                "اجازه دسترسی به GPS داده نشد"
             );
+        },
+
+        {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000
         }
-
-        await updateRoute(
-            lat,
-            lng
-        );
-
-    },
-
-    (err)=>{
-        alert(
-            "اجازه دسترسی به GPS داده نشد"
-        );
-    },
-
-    {
-        enableHighAccuracy:true,
-        maximumAge:0,
-        timeout:10000
-    }
-
-);
+    );
 
 </script>
 
