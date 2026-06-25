@@ -45,6 +45,7 @@
         <span class="btn btn-warning" id="distance">مسافت: ---</span>
         <span class="btn btn-warning" id="duration">زمان: ---</span>
     </div>
+    
     <div class="col-md-6 col-xs-12">
 
         <div id="mapApps">
@@ -528,8 +529,8 @@ background:#f8f9fa;
     function openNeshan() {
 
         window.open(
-            `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
-            // `https://neshan.org/maps/routing/car/origin/${userCurrentLat},${userCurrentLng}/destination/${destination.lat},${destination.lng}`,
+            // `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
+            `https://nshn.ir/origin?lat=${destination.lat}&lng=${destination.lng}/destination?lat=${userCurrentLat}&lng=${userCurrentLng}`,
             '_blank'
         );
 
@@ -538,7 +539,8 @@ background:#f8f9fa;
     function openBalad() {
 
         window.open(
-            `https://balad.ir/directions/driving?origin=${userCurrentLng},${userCurrentLat}&destination=${destination.lng},${destination.lat}`,
+            `https://balad.ir/p/${lat},${lng}`,
+            // `https://balad.ir/directions/driving?origin=${userCurrentLng},${userCurrentLat}&destination=${destination.lng},${destination.lat}`,
             '_blank'
         );
 
