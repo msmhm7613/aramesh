@@ -526,10 +526,10 @@ background:#f8f9fa;
     }
 
     function openNeshan() {
-
+        alert(1);
         window.open(
             // `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
-            `https://nshn.ir/origin/lat=${destination.lat}&lng=${destination.lng}/destination/lat=${userCurrentLat}&lng=${userCurrentLng}`,
+            `https://nshn.ir/origin/${destination.lat}/${destination.lng}/destination/${userCurrentLat}/${userCurrentLng}`,
             '_blank'
         );
 
