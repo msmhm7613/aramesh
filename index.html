@@ -49,7 +49,7 @@
         <div id="mapApps">
 
             <button onclick="openExternalNavigation()">
-            با برنامه دلخواه
+                 تست مسیر
             </button>
 
         </div>
@@ -461,17 +461,10 @@ background:#f8f9fa;
     );
 
 
-    // function openExternalNavigation() {
-    //
-    //     window.location.href =
-    //         `geo:${lat},${lng}?q=${position.coords.latitude},${position.coords.longitude}`;
-    //
-    // }
-
     function openExternalNavigation() {
-
+        alert("test");
         const url =
-            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            `https://www.google.com/maps/dir/?api=1&destination=${destination.lat},${destination.lng}`;
 
         window.open(url, "_blank");
 
