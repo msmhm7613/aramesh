@@ -38,21 +38,22 @@
 
 <body>
 
-<div id="panel" dir="rtl">
+<div class="row" dir="rtl">
 
     <div class="col-md-6 col-xs-12">
         <span class="btn btn-warning" id="speed">سرعت: 0 km/h</span>
         <span class="btn btn-warning" id="distance">مسافت: ---</span>
         <span class="btn btn-warning" id="duration">زمان: ---</span>
     </div>
-    <div class="col-md-6 col-xs-12">
 
+    <div class="col-md-6 col-xs-12">
         <div id="mapApps">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
                 انتخاب سایر مسیر یاب ها
             </button>
         </div>
     </div>
+
 </div>
 
 
@@ -526,7 +527,7 @@ background:#f8f9fa;
     }
 
     function openNeshan() {
-        alert(2);
+
         window.open(
             `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
             '_blank'
@@ -537,7 +538,7 @@ background:#f8f9fa;
     function openBalad() {
 
         window.open(
-            `https://balad.ir/p/${lat},${lng}`,
+            `https://balad.ir/p/${userCurrentLat},${userCurrentLng}`,
             // `https://balad.ir/directions/driving?origin=${userCurrentLng},${userCurrentLat}&destination=${destination.lng},${destination.lat}`,
             '_blank'
         );
