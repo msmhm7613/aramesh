@@ -37,10 +37,23 @@
 
 <body>
 
-<div id="panel">
-    <span id="speed">سرعت: 0 km/h</span>
-    <span id="distance">مسافت: ---</span>
-    <span id="duration">زمان: ---</span>
+<div id="panel" dir="rtl">
+
+    <div class="col-md-6">
+        <span id="speed">سرعت: 0 km/h</span>
+        <span id="distance">مسافت: ---</span>
+        <span id="duration">زمان: ---</span>
+    </div>
+    <div class="col-md-6">
+
+        <div id="mapApps">
+
+            <button onclick="openExternalNavigation()">
+                 مسیر یابی با برنامه دلخواه
+            </button>
+
+        </div>
+    </div>
 </div>
 
 <div id="map"></div>
@@ -75,6 +88,8 @@ background:#f8f9fa;
     let lastLng = null;
 
     const destination = {
+        /*lat: 32.144369570819734,
+        lng: 54.112763037090076*/
         lat: 31.856782644793213,
         lng: 54.34915489309451
     };
@@ -120,7 +135,7 @@ background:#f8f9fa;
 
         const route = data.routes[0];
 
-        updateNavigation(route,lat,lng);
+        updateNavigation(route, lat, lng);
         renderSteps(route);
 
         const coordinates =
@@ -211,14 +226,12 @@ background:#f8f9fa;
 
             }
 
-            if(index < currentStepIndex){
+            if (index < currentStepIndex) {
 
                 bg = "#28a745";
                 color = "white";
 
-            }
-
-            else if(index === currentStepIndex){
+            } else if (index === currentStepIndex) {
 
                 bg = "#007bff";
                 color = "white";
@@ -256,13 +269,13 @@ background:#f8f9fa;
             .innerHTML = html;
     }
 
-    function updateNavigation(route, lat, lng){
+    function updateNavigation(route, lat, lng) {
 
-        if(
+        if (
             !route.legs ||
             !route.legs.length ||
             !route.legs[0].steps.length
-        ){
+        ) {
             return;
         }
 
@@ -271,7 +284,7 @@ background:#f8f9fa;
         let nearestStep = 0;
         let nearestDistance = Infinity;
 
-        steps.forEach((step,index)=>{
+        steps.forEach((step, index) => {
 
             const distance =
                 getDistance(
@@ -281,7 +294,7 @@ background:#f8f9fa;
                     step.maneuver.location[0]
                 );
 
-            if(distance < nearestDistance){
+            if (distance < nearestDistance) {
 
                 nearestDistance = distance;
                 nearestStep = index;
@@ -305,7 +318,7 @@ background:#f8f9fa;
                 : "مسیر پیش رو";
 
         let text =
-           `⬆️ ${Math.round(step.distance)} ` + ` متر دیگر در ${roadName} مستقیم حرکت کنید`;
+            `⬆️ ${Math.round(step.distance)} ` + ` متر دیگر در ${roadName} مستقیم حرکت کنید`;
         if (step.maneuver.type === "turn") {
 
             if (step.maneuver.modifier === "right") {
@@ -390,7 +403,7 @@ background:#f8f9fa;
 
                 driverMarker =
                     L.marker(
-                        [lat,lng],
+                        [lat, lng],
                         {
                             icon: carIcon
                         }
@@ -446,6 +459,14 @@ background:#f8f9fa;
             timeout: 10000
         }
     );
+
+
+    function openExternalNavigation() {
+        
+        window.location.href =
+            `geo:${lat},${lng}?q=${position.coords.latitude},${position.coords.longitude}`;
+
+    }
 
 </script>
 
