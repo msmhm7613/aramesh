@@ -40,12 +40,12 @@
 
 <div id="panel" dir="rtl">
 
-    <div class="col-md-6">
+    <div class="col-md-6 col-xs-12">
         <span class="btn btn-warning" id="speed">سرعت: 0 km/h</span>
         <span class="btn btn-warning" id="distance">مسافت: ---</span>
         <span class="btn btn-warning" id="duration">زمان: ---</span>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 col-xs-12">
 
         <div id="mapApps">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">
@@ -72,25 +72,25 @@
                 <hr>
                 <div class="row">
                     <div class="col-md-6">
-                        <button onclick="openGoogleMaps()" class="btn btn-success col-md-12">
+                        <button onclick="openGoogleMaps()" class="btn btn-success col-md-12 col-xs-12">
                             Google Maps
                         </button>
                     </div>
 
                     <div class="col-md-6">
-                        <button onclick="openNeshan()" class="btn btn-success col-md-12">
+                        <button onclick="openNeshan()" class="btn btn-success col-md-12 col-xs-12">
                             نشان
                         </button>
                     </div>
                     <div class="row">&nbsp;</div>
                     <div class="col-md-6">
-                        <button onclick="openBalad()" class="btn btn-success col-md-12">
+                        <button onclick="openBalad()" class="btn btn-success col-md-12 col-xs-12">
                             بلد
                         </button>
                     </div>
 
                     <div class="col-md-6">
-                        <button onclick="openWaze()" class="btn btn-success col-md-12">
+                        <button onclick="openWaze()" class="btn btn-success col-md-12 col-xs-12">
                             Waze
                         </button>
                     </div>
@@ -528,7 +528,8 @@ background:#f8f9fa;
     function openNeshan() {
 
         window.open(
-            `https://neshan.org/maps/routing/car/origin/${userCurrentLat},${userCurrentLng}/destination/${destination.lat},${destination.lng}`,
+            `https://nshn.ir/?lat=${${destination.lat}}&lng=${${destination.lng}}`,
+            // `https://neshan.org/maps/routing/car/origin/${userCurrentLat},${userCurrentLng}/destination/${destination.lat},${destination.lng}`,
             '_blank'
         );
 
