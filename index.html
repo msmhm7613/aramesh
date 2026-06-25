@@ -461,13 +461,21 @@ background:#f8f9fa;
     );
 
 
+    // function openExternalNavigation() {
+    //
+    //     window.location.href =
+    //         `geo:${lat},${lng}?q=${position.coords.latitude},${position.coords.longitude}`;
+    //
+    // }
+
     function openExternalNavigation() {
-        
-        window.location.href =
-            `geo:${lat},${lng}?q=${position.coords.latitude},${position.coords.longitude}`;
+
+        const url =
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+        window.open(url, "_blank");
 
     }
-
 </script>
 
 </body>
