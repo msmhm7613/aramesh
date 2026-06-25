@@ -45,7 +45,6 @@
         <span class="btn btn-warning" id="distance">مسافت: ---</span>
         <span class="btn btn-warning" id="duration">زمان: ---</span>
     </div>
-    
     <div class="col-md-6 col-xs-12">
 
         <div id="mapApps">
@@ -530,7 +529,7 @@ background:#f8f9fa;
 
         window.open(
             // `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
-            `https://nshn.ir/origin?lat=${destination.lat}&lng=${destination.lng}/destination?lat=${userCurrentLat}&lng=${userCurrentLng}`,
+            `https://nshn.ir/origin/lat=${destination.lat}&lng=${destination.lng}/destination/lat=${userCurrentLat}&lng=${userCurrentLng}`,
             '_blank'
         );
 
