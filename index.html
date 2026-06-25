@@ -71,27 +71,27 @@
             <div class="modal-body">
                 برنامه مسیر یاب مورد علاقه نصب شده روی تلفن همراه خود را انتخاب کنید
                 <hr>
-                <div class="row">
-                    <div class="col-md-6">
-                        <button onclick="openGoogleMaps()" class="btn btn-success col-md-12 col-xs-12">
+                <div class="container">
+                    <div class="d-grid col-md-6 col-xs-12">
+                        <button onclick="openGoogleMaps()" class="btn btn-outline-success">
                             Google Maps
                         </button>
                     </div>
 
-                    <div class="col-md-6">
-                        <button onclick="openNeshan()" class="btn btn-success col-md-12 col-xs-12">
+                    <div class="d-grid col-md-6 col-xs-12">
+                        <button onclick="openNeshan()" class="btn btn-outline-success">
                             نشان
                         </button>
                     </div>
                     <div class="row">&nbsp;</div>
-                    <div class="col-md-6">
-                        <button onclick="openBalad()" class="btn btn-success col-md-12 col-xs-12">
+                    <div class="d-grid col-md-6 col-xs-12">
+                        <button onclick="openBalad()" class="btn btn-outline-success">
                             بلد
                         </button>
                     </div>
 
-                    <div class="col-md-6">
-                        <button onclick="openWaze()" class="btn btn-success col-md-12 col-xs-12">
+                    <div class="d-grid col-md-6 col-xs-12">
+                        <button onclick="openWaze()" class="btn btn-outline-success">
                             Waze
                         </button>
                     </div>
@@ -530,6 +530,8 @@ background:#f8f9fa;
 
         window.open(
             `https://nshn.ir/?lat=${destination.lat}&lng=${destination.lng}`,
+            // `https://neshan.org/maps/routing/car/destination/${destination.lat},${destination.lng}`,
+
             '_blank'
         );
 
